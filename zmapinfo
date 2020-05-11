@@ -1,0 +1,8 @@
+map test_grounds "Test grounds"
+{
+	sky1 = "SKY1"
+
+   EventHandlers = "test_grounds_event"
+
+   music = "d_runnin"
+}
