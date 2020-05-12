@@ -1,9 +1,9 @@
 //most things here attached to pre defined sectors
 //so direct copypasting can, and would, cause problems
-class test_grounds_event : eventhandler
+class test_ground_event : eventhandler
 {
 
-private void grounds_freeze_actor(actor a)
+private void ground_freeze_actor(actor a)
 {
     if(a)
     {
@@ -12,62 +12,62 @@ private void grounds_freeze_actor(actor a)
     }
 }
 
-private void grounds_init_monsters()
+private void ground_init_monsters()
 {
     actor a = actor.spawn("arachnotron", (-1234, 2381, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("cyberdemon", (-1408, 2368, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("fatso", (-1621, 2361, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("painelemental", (-1792, 2304, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("cacodemon", (-1928, 2281, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("demon", (-2112, 2176, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("hellknight", (-2180, 2090, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("baronofhell", (-2242, 2000, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("archvile", (-2304, 1856, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("doomimp", (-2313, 1726, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("revenant", (-2336, 1632, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("lostsoul", (-2340, 1519, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("spidermastermind", (-2464, 1312, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("chaingunguy", (-2331, 1070, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("shotgunguy", (-2316, 947, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("zombieman", (-2300, 818, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 
     a = actor.spawn("wolfensteinss", (-2269, 688, 80) );
-    grounds_freeze_actor(a);
+    ground_freeze_actor(a);
 }
 
 //ammo and backpack counts as weapons
-private void grounds_init_weapons()
+private void ground_init_weapons()
 {
     actor.spawn("chainsaw", (232, 905, 40) );
     actor.spawn("pistol", (122, 890, 40) );
@@ -90,7 +90,7 @@ private void grounds_init_weapons()
     actor.spawn("backpack", (382, 1040, 40) );
 }
 
-private void grounds_init_items()
+private void ground_init_items()
 {
     actor.spawn("armorbonus", (768, 64, 40) );
     actor.spawn("greenarmor", (864, -32, 40) );
@@ -111,12 +111,12 @@ private void grounds_init_items()
 
 override void worldloaded(worldevent e)
 {
-    grounds_init_monsters();
-    grounds_init_weapons();
-    grounds_init_items();
+    ground_init_monsters();
+    ground_init_weapons();
+    ground_init_items();
 }
 
-private void grounds_spawn_item(class<actor> type = null, int pos = 0)
+private void ground_spawn_item(class<actor> type = null, int pos = 0)
 {
     if(type && pos)
     {
@@ -139,11 +139,11 @@ private void grounds_spawn_item(class<actor> type = null, int pos = 0)
     }
 }
 
-private void grounds_spawn_monster(class<actor> type = null)
+private void ground_spawn_monster(class<actor> type = null)
 {
     if(type)
     {
-        if(type == 'demon' && random[grounds_monster](0, 1) == 1)
+        if(type == 'demon' && random[ground_monster](0, 1) == 1)
             type = 'spectre';
 
         actor.spawn(type, (-1920, 1792, -32), ALLOW_REPLACE);
@@ -377,10 +377,10 @@ override void WorldLinePreActivated(WorldEvent e)
         if(acc && spawn_type)
         {
             if(spawn_type == 1 || spawn_type == 2)
-            grounds_spawn_item(acc, spawn_type);
+            ground_spawn_item(acc, spawn_type);
 
             else
-                grounds_spawn_monster(acc);
+                ground_spawn_monster(acc);
         }
 
     }

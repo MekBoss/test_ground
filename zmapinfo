@@ -1,8 +1,8 @@
-map test_grounds "Test grounds"
+map test_ground "Test ground"
 {
 	sky1 = "SKY1"
 
-   EventHandlers = "test_grounds_event"
+   EventHandlers = "test_ground_event"
 
    music = "d_runnin"
 }
