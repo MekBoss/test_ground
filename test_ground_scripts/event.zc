@@ -1,7 +1,87 @@
 //most things here attached to pre defined sectors
 //so direct copypasting can, and would, cause problems
+
+//spawning sector numbers (things spawns here)
+enum ground_spawn_points
+{
+    //sector number for spawning weapons/ammo...
+    GSP_WEAPON = 95,
+    //...items...
+    GSP_ITEM = 99,
+    //...and monsters
+    GSP_MONSTER = 119
+};
+
+//defines which sector numbers should be used for spawning monsters
+enum ground_monster_sectors
+{
+    GMS_ZOMBIEMAN = 98,
+    GMS_NAZI = 100,
+    GMS_SHOTGUNGUY = 101,
+    GMS_CHAINGUNNER = 102,
+    GMS_MASTERMIND = 103,
+    GMS_LOSTSOUL = 114,
+    GMS_REVENANT = 113,
+    GMS_DOOMIMP = 112,
+    GMS_ARCHVILE = 111,
+    GMS_BARON = 110,
+    GMS_KNIGHT = 115,
+    GMS_DEMON = 109,
+    GMS_CACODEMON = 108,
+    GMS_PAIN = 107,
+    GMS_FATSO = 106,
+    GMS_CYBERDEMON = 104,
+    GMS_ARACHNOTRON = 105,
+};
+
+//defines sector numbers for all inventory items (all, like weapons, ammo, medikits, etc.)
+enum ground_item_sectors
+{
+    //WEAPONS AND AMMO
+    GIS_CHAINSAW = 29,
+    GIS_PISTOL = 68,
+    GIS_SHOTGUN = 67,
+    GIS_SSG = 66,
+    GIS_CHAINGUN = 65,
+    GIS_ROCKETLAUNCHER = 64,
+    GIS_PLASMARIFLE = 63,
+    GIS_BFG = 62,
+    GIS_CLIP = 61,
+    GIS_CLIPBOX = 60,
+    GIS_SHELL = 59,
+    GIS_SHELLBOX = 53,
+    GIS_ROCKETAMMO = 54,
+    GIS_ROCKETBOX = 55,
+    GIS_CELL = 56,
+    GIS_CELLPACK = 57,
+    GIS_BACKPACK = 58,
+
+    //other items
+    GIS_ARMORBONUS = 69,
+    GIS_GREENARMOR = 31,
+    GIS_BLUEARMOR = 13,
+    GIS_MEGASPHERE = 70,
+    GIS_ALLMAP = 71,
+    GIS_RADSUIT = 72,
+    GIS_INFRARED = 73,
+    GIS_INVUL = 74,
+    GIS_HEALTHBONUS = 80,
+    GIS_STIMPACK = 79,
+    GIS_MEDIKIT = 78,
+    GIS_BERSERK = 77,
+    GIS_INVIS = 75,
+    GIS_SOULSPHERE = 76,
+};
+
+
+enum ground_line_special
+{
+    GLS_ZOMBIEMAN = 1,
+};
+
 class test_ground_event : eventhandler
 {
+private actor temp_arena_center;
 
 private void ground_freeze_actor(actor a)
 {
@@ -9,103 +89,130 @@ private void ground_freeze_actor(actor a)
     {
         a.tics = -1;
         a.bdormant = true;
+        if(!temp_arena_center)
+            temp_arena_center = actor.spawn("healthbonus", ground_get_sector_center(level.sectors[85]) );
+
+        if(temp_arena_center)
+            a.a_face(temp_arena_center);
     }
+}
+
+private vector3 ground_get_sector_center(sector s = null)
+{
+    if(s)
+        return(s.centerspot, s.CenterFloor() );
+
+    else
+        return (0, 0, 0);
 }
 
 private void ground_init_monsters()
 {
-    actor a = actor.spawn("arachnotron", (-1234, 2381, 80) );
+    switch(gameinfo.gametype)
+    {
+        case GAME_Doom:
+        default:
+            grounds_init_doom_monsters();
+        break;
+    }
+}
+
+private void grounds_init_doom_monsters()
+{
+    actor a = actor.spawn("arachnotron", ground_get_sector_center(level.sectors[GMS_ARACHNOTRON]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("cyberdemon", (-1408, 2368, 80) );
+    a = actor.spawn("cyberdemon", ground_get_sector_center(level.sectors[GMS_CYBERDEMON]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("fatso", (-1621, 2361, 80) );
+    a = actor.spawn("fatso", ground_get_sector_center(level.sectors[GMS_FATSO]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("painelemental", (-1792, 2304, 80) );
+    a = actor.spawn("painelemental", ground_get_sector_center(level.sectors[GMS_PAIN]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("cacodemon", (-1928, 2281, 80) );
+    a = actor.spawn("cacodemon", ground_get_sector_center(level.sectors[GMS_CACODEMON]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("demon", (-2112, 2176, 80) );
+    a = actor.spawn("demon", ground_get_sector_center(level.sectors[GMS_DEMON]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("hellknight", (-2180, 2090, 80) );
+    a = actor.spawn("hellknight", ground_get_sector_center(level.sectors[GMS_KNIGHT]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("baronofhell", (-2242, 2000, 80) );
+    a = actor.spawn("baronofhell", ground_get_sector_center(level.sectors[GMS_BARON]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("archvile", (-2304, 1856, 80) );
+    a = actor.spawn("archvile", ground_get_sector_center(level.sectors[GMS_ARCHVILE]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("doomimp", (-2313, 1726, 80) );
+    a = actor.spawn("doomimp", ground_get_sector_center(level.sectors[GMS_DOOMIMP]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("revenant", (-2336, 1632, 80) );
+    a = actor.spawn("revenant", ground_get_sector_center(level.sectors[GMS_REVENANT]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("lostsoul", (-2340, 1519, 80) );
+    a = actor.spawn("lostsoul", ground_get_sector_center(level.sectors[GMS_LOSTSOUL]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("spidermastermind", (-2464, 1312, 80) );
+    a = actor.spawn("spidermastermind", ground_get_sector_center(level.sectors[GMS_MASTERMIND]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("chaingunguy", (-2331, 1070, 80) );
+    a = actor.spawn("chaingunguy", ground_get_sector_center(level.sectors[GMS_CHAINGUNNER]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("shotgunguy", (-2316, 947, 80) );
+    a = actor.spawn("shotgunguy", ground_get_sector_center(level.sectors[GMS_SHOTGUNGUY]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("zombieman", (-2300, 818, 80) );
+    a = actor.spawn("zombieman", ground_get_sector_center(level.sectors[GMS_ZOMBIEMAN]) );
     ground_freeze_actor(a);
 
-    a = actor.spawn("wolfensteinss", (-2269, 688, 80) );
+    a = actor.spawn("wolfensteinss", ground_get_sector_center(level.sectors[GMS_NAZI]) );
     ground_freeze_actor(a);
+
+    if(temp_arena_center)
+        temp_arena_center.destroy();
 }
 
 //ammo and backpack counts as weapons
 private void ground_init_weapons()
 {
-    actor.spawn("chainsaw", (232, 905, 40) );
-    actor.spawn("pistol", (122, 890, 40) );
-    actor.spawn("shotgun", (22, 912, 40) );
-    actor.spawn("supershotgun", (-67, 958, 40) );
-    actor.spawn("chaingun", (-133, 1042, 40) );
-    actor.spawn("rocketlauncher", (-164, 1136, 40) );
-    actor.spawn("plasmarifle", (-167, 1246, 40) );
-    actor.spawn("bfg9000", (-131, 1338, 40) );
+    actor.spawn("chainsaw", ground_get_sector_center(level.sectors[GIS_CHAINSAW]) );
+    actor.spawn("pistol", ground_get_sector_center(level.sectors[GIS_PISTOL]) );
+    actor.spawn("shotgun", ground_get_sector_center(level.sectors[GIS_SHOTGUN]) );
+    actor.spawn("supershotgun", ground_get_sector_center(level.sectors[GIS_SSG]) );
+    actor.spawn("chaingun", ground_get_sector_center(level.sectors[GIS_CHAINGUN]) );
+    actor.spawn("rocketlauncher", ground_get_sector_center(level.sectors[GIS_ROCKETLAUNCHER]) );
+    actor.spawn("plasmarifle", ground_get_sector_center(level.sectors[GIS_PLASMARIFLE]) );
+    actor.spawn("bfg9000", ground_get_sector_center(level.sectors[GIS_BFG]) );
 
-    actor.spawn("clip", (-60, 1418, 40) );
-    actor.spawn("clipbox", (32, 1469, 40) );
-    actor.spawn("shell", (118, 1486, 40) );
-    actor.spawn("shellbox", (225, 1468, 40) );
-    actor.spawn("rocketammo", (313, 1415, 40) );
-
-    actor.spawn("rocketbox", (378, 1337, 40) );
-    actor.spawn("cell", (416, 1243, 40) );
-    actor.spawn("cellpack", (412, 1134, 40) );
-    actor.spawn("backpack", (382, 1040, 40) );
+    actor.spawn("clip", ground_get_sector_center(level.sectors[GIS_CLIP]) );
+    actor.spawn("clipbox", ground_get_sector_center(level.sectors[GIS_CLIPBOX]) );
+    actor.spawn("shell", ground_get_sector_center(level.sectors[GIS_SHELL]) );
+    actor.spawn("shellbox", ground_get_sector_center(level.sectors[GIS_SHELLBOX]) );
+    actor.spawn("rocketammo", ground_get_sector_center(level.sectors[GIS_ROCKETAMMO]) );
+    actor.spawn("rocketbox", ground_get_sector_center(level.sectors[GIS_ROCKETBOX]) );
+    actor.spawn("cell", ground_get_sector_center(level.sectors[GIS_CELL]) );
+    actor.spawn("cellpack", ground_get_sector_center(level.sectors[GIS_CELLPACK]) );
+    actor.spawn("backpack", ground_get_sector_center(level.sectors[GIS_BACKPACK]) );
 }
 
 private void ground_init_items()
 {
-    actor.spawn("armorbonus", (768, 64, 40) );
-    actor.spawn("greenarmor", (864, -32, 40) );
-    actor.spawn("bluearmor", (960, -128, 40) );
-    actor.spawn("healthbonus", (1056, -224, 40) );
-    actor.spawn("stimpack", (1152, 320, 40) );
-    actor.spawn("medikit", (1248, -416, 40) );
-    actor.spawn("berserk", (1344, -512, 40) );
-    actor.spawn("megasphere", (1024, 320, 40) );
-    actor.spawn("allmap", (1120, 224, 40) );
-    actor.spawn("radsuit", (1216, 128, 40) );
-    actor.spawn("infrared", (1312, 32, 40) );
-    actor.spawn("invulnerabilitysphere", (1408, -64, 40) );
-    actor.spawn("blursphere", (1504, -160, 40) );
-    actor.spawn("soulsphere", (1600, -256, 40) );
+    actor.spawn("armorbonus", ground_get_sector_center(level.sectors[GIS_ARMORBONUS]) );
+    actor.spawn("greenarmor", ground_get_sector_center(level.sectors[GIS_GREENARMOR]) );
+    actor.spawn("bluearmor", ground_get_sector_center(level.sectors[GIS_BLUEARMOR]) );
+    actor.spawn("healthbonus", ground_get_sector_center(level.sectors[GIS_HEALTHBONUS]) );
+    actor.spawn("stimpack", ground_get_sector_center(level.sectors[GIS_STIMPACK]) );
+    actor.spawn("medikit", ground_get_sector_center(level.sectors[GIS_MEDIKIT]) );
+    actor.spawn("berserk", ground_get_sector_center(level.sectors[GIS_BERSERK]) );
+    actor.spawn("megasphere", ground_get_sector_center(level.sectors[GIS_MEGASPHERE]) );
+    actor.spawn("allmap", ground_get_sector_center(level.sectors[GIS_ALLMAP]) );
+    actor.spawn("radsuit", ground_get_sector_center(level.sectors[GIS_RADSUIT]) );
+    actor.spawn("infrared", ground_get_sector_center(level.sectors[GIS_INFRARED]) );
+    actor.spawn("invulnerabilitysphere", ground_get_sector_center(level.sectors[GIS_INVUL]) );
+    actor.spawn("blursphere", ground_get_sector_center(level.sectors[GIS_INVIS]) );
+    actor.spawn("soulsphere", ground_get_sector_center(level.sectors[GIS_SOULSPHERE]) );
     
 }
 
@@ -128,11 +235,11 @@ private void ground_spawn_item(class<actor> type = null, int pos = 0)
             break;
 
             case 1:
-                p = (128, 1184, 32);
+                p = ground_get_sector_center(level.sectors[GSP_WEAPON]);
             break;
 
             case 2:
-                p = (1120, -32, 32);
+                p = ground_get_sector_center(level.sectors[GSP_ITEM]);
             break;
         }
         actor.spawn(type, p, ALLOW_REPLACE);
@@ -146,7 +253,7 @@ private void ground_spawn_monster(class<actor> type = null)
         if(type == 'demon' && random[ground_monster](0, 1) == 1)
             type = 'spectre';
 
-        actor.spawn(type, (-1920, 1792, -32), ALLOW_REPLACE);
+        actor.spawn(type, ground_get_sector_center(level.sectors[GSP_MONSTER]), ALLOW_REPLACE);
     }
 }
 
