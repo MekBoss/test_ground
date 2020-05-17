@@ -73,10 +73,24 @@ enum ground_item_sectors
     GIS_SOULSPHERE = 76,
 };
 
+//store numbers for specific sectors
+enum ground_specific_sectors
+{
+    //sectors with jump height pillar
+    GSS_JUMP_SECTOR_PILLAR = 126,
+    GSS_JUMP_SECTOR_MAIN = 125,
+    GSS_JUMP_SECTOR_SWITCH_UP = 127,
+    GSS_JUMP_SECTOR_SWITCH_DOWN = 128,
+    GLS_BATLE_ARENA = 85
+}
 
+//pair line number with special action it should execute on activation
 enum ground_line_special
 {
-    GLS_ZOMBIEMAN = 1,
+    GLS_JUMP_TEST_UP = 907,
+    GLS_JUMP_TEST_DOWN = 882,
+    GLS_CLEAR_WEAPONS = 897,
+    GLS_CLEAR_ITEMS = 902
 };
 
 class test_ground_event : eventhandler
@@ -90,7 +104,7 @@ private void ground_freeze_actor(actor a)
         a.tics = -1;
         a.bdormant = true;
         if(!temp_arena_center)
-            temp_arena_center = actor.spawn("healthbonus", ground_get_sector_center(level.sectors[85]) );
+            temp_arena_center = actor.spawn("healthbonus", ground_get_sector_center(level.sectors[GLS_BATLE_ARENA]) );
 
         if(temp_arena_center)
             a.a_face(temp_arena_center);
@@ -254,6 +268,46 @@ private void ground_spawn_monster(class<actor> type = null)
             type = 'spectre';
 
         actor.spawn(type, ground_get_sector_center(level.sectors[GSP_MONSTER]), ALLOW_REPLACE);
+    }
+}
+
+private void ground_move_jump_pillar(bool up = true)
+{
+    if(up)
+    {
+        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveFloor(10, -(level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterFloor() + 10), 0, 1, 0, true);
+        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterCeiling() + 10, 0, 1, 0);
+
+        level.sectors[GSS_JUMP_SECTOR_MAIN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_MAIN].CenterCeiling() + 10, 0, 1, 0);
+        level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].CenterCeiling() + 10, 0, 1, 0);
+        level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].CenterCeiling() + 10, 0, 1, 0);
+    }
+
+    else
+    {
+        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveFloor(10, -(level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterFloor() - 10), 0, -1, 0);
+        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterCeiling() - 10, 0, -1, 0);
+
+        level.sectors[GSS_JUMP_SECTOR_MAIN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_MAIN].CenterCeiling() - 10, 0, -1, 0);
+        level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].CenterCeiling() - 10, 0, -1, 0);
+        level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].CenterCeiling() - 10, 0, -1, 0);
+    }
+}
+
+private void ground_destroy_actors_in_sector(sector s)
+{
+    if(s)
+    {
+        array<actor> list;
+        list.clear();
+
+		for (Actor a = s.thinglist; a != null; a = a.snext)
+		{
+            list.push(a);
+        }
+
+        for(uint i = 0; i < list.size(); i++)
+            list[i].destroy();
     }
 }
 
@@ -478,6 +532,21 @@ override void WorldLinePreActivated(WorldEvent e)
             case 749:
                acc = "wolfensteinss";
                 spawn_type = 3;
+            break;
+
+            case GLS_JUMP_TEST_UP:
+                ground_move_jump_pillar();
+            break;
+
+            case GLS_JUMP_TEST_DOWN:
+                ground_move_jump_pillar(false);
+            break;
+
+            case GLS_CLEAR_WEAPONS:
+                ground_destroy_actors_in_sector(level.sectors[GSP_WEAPON]);
+            break;
+            case GLS_CLEAR_ITEMS:
+                ground_destroy_actors_in_sector(level.sectors[GSP_ITEM]);
             break;
        }
 
