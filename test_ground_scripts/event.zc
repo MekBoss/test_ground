@@ -256,7 +256,7 @@ private void ground_spawn_item(class<actor> type = null, int pos = 0)
                 p = ground_get_sector_center(level.sectors[GSP_ITEM]);
             break;
         }
-        actor.spawn(type, p, ALLOW_REPLACE);
+        actor.spawn(type, p, ALLOW_REPLACE).bdropped = false;
     }
 }
 
