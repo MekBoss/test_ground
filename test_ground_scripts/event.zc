@@ -1,21 +1,12 @@
 //most things here use info attached to sectors/lines in map editor
 //so copypasting for some other projects can, and would, cause problems
-
-//store numbers for specific sectors
-enum ground_specific_sectors
-{
-    //sectors with jump height pillar
-    GSS_JUMP_SECTOR_PILLAR = 126,
-    GSS_JUMP_SECTOR_MAIN = 125,
-    GSS_JUMP_SECTOR_SWITCH_UP = 127,
-    GSS_JUMP_SECTOR_SWITCH_DOWN = 128,
-}
-
 class test_ground_event : eventhandler
 {
 private actor temp_arena_center;
 
 private sector monster_spawn, item_spawn, weapon_spawn, battle_arena;
+private sector jump_pillar_sector;
+private array<sector> jump_pillar_aditional;
 
 private void ground_freeze_actor(actor a)
 {
@@ -148,6 +139,21 @@ private void ground_init_spec_sectors()
             //console.printf("battle sector %i", i);
             battle_arena = level.sectors[i];
         }
+
+        st = level.sectors[i].GetUDMFInt("user_jump_pillar_sector");
+        if(st > 0)
+        {
+            //console.printf("battle sector %i", i);
+            jump_pillar_sector = level.sectors[i];
+        }
+        
+        st = level.sectors[i].GetUDMFInt("user_jump_pillar_additional");
+        if(st > 0)
+        {
+            //console.printf("battle sector %i", i);
+            sector s = level.sectors[i];
+            jump_pillar_aditional.push(s);
+        }
     }
 }
 
@@ -182,7 +188,7 @@ private void ground_spawn_monster(class<actor> type = null)
         if(type == 'demon' && random[ground_monster](0, 1) == 1)
             type = 'spectre';
 
-        actor.spawn(type, ground_get_sector_center(monster_spawn), ALLOW_REPLACE);
+        actor.spawn(type, ground_get_sector_center(monster_spawn), ALLOW_REPLACE).angle = 225;
     }
 }
 
@@ -190,22 +196,21 @@ private void ground_move_jump_pillar(bool up = true)
 {
     if(up)
     {
-        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveFloor(10, -(level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterFloor() + 10), 0, 1, 0, true);
-        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterCeiling() + 10, 0, 1, 0);
+        jump_pillar_sector.MoveFloor(10, -(jump_pillar_sector.CenterFloor() + 10), 0, 1, 0, true);
+        jump_pillar_sector.MoveCeiling(10, jump_pillar_sector.CenterCeiling() + 10, 0, 1, 0);
 
-        level.sectors[GSS_JUMP_SECTOR_MAIN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_MAIN].CenterCeiling() + 10, 0, 1, 0);
-        level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].CenterCeiling() + 10, 0, 1, 0);
-        level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].CenterCeiling() + 10, 0, 1, 0);
+        
+        for(uint i = 0; i < jump_pillar_aditional.size(); i++)
+            jump_pillar_aditional[i].MoveCeiling(10, jump_pillar_aditional[i].CenterCeiling() + 10, 0, 1, 0);
     }
 
     else
     {
-        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveFloor(10, -(level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterFloor() - 10), 0, -1, 0);
-        level.sectors[GSS_JUMP_SECTOR_PILLAR].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_PILLAR].CenterCeiling() - 10, 0, -1, 0);
+        jump_pillar_sector.MoveFloor(10, -(jump_pillar_sector.CenterFloor() - 10), 0, -1, 0);
+        jump_pillar_sector.MoveCeiling(10, jump_pillar_sector.CenterCeiling() - 10, 0, -1, 0);
 
-        level.sectors[GSS_JUMP_SECTOR_MAIN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_MAIN].CenterCeiling() - 10, 0, -1, 0);
-        level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_DOWN].CenterCeiling() - 10, 0, -1, 0);
-        level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].MoveCeiling(10, level.sectors[GSS_JUMP_SECTOR_SWITCH_UP].CenterCeiling() - 10, 0, -1, 0);
+        for(uint i = 0; i < jump_pillar_aditional.size(); i++)
+            jump_pillar_aditional[i].MoveCeiling(10, jump_pillar_aditional[i].CenterCeiling() - 10, 0, 1, 0);
     }
 }
 
@@ -213,8 +218,7 @@ private void ground_destroy_actors_in_sector(sector s)
 {
     if(s)
     {
-        array<actor> list;
-        list.clear();
+        array<actor> list; list.clear();
 
 		for (Actor a = s.thinglist; a != null; a = a.snext)
 		{
@@ -233,6 +237,7 @@ override void WorldLinePreActivated(WorldEvent e)
         string st = e.activatedline.getUDMFstring("user_doom_spawn_type");
         if(st.length() > 0)
         {
+            e.ShouldActivate = false;
             ground_spawn_monster(st);
             return;
         }
@@ -240,6 +245,7 @@ override void WorldLinePreActivated(WorldEvent e)
         st = e.activatedline.getUDMFstring("user_spawn_doom_weapon");
         if(st.length() > 0)
         {
+            e.ShouldActivate = false;
             ground_spawn_weapon(st);
             return;
         }
@@ -248,12 +254,14 @@ override void WorldLinePreActivated(WorldEvent e)
         if(st.length() > 0)
         {
             ground_spawn_item(st);
+            e.ShouldActivate = false;
             return;
         }
 
         st = e.activatedline.getUDMFstring("user_clear_sector");
         if(st.length() > 0)
         {
+            e.ShouldActivate = false;
             switch(name(st) )
             {
                 default:
@@ -273,11 +281,20 @@ override void WorldLinePreActivated(WorldEvent e)
         st = e.activatedline.getUDMFstring("user_move_jump_pillar");
         if(st.length() > 0)
         {
+            e.ShouldActivate = false;
             if(st == "up")
                 ground_move_jump_pillar();
 
             if(st == "down")
                 ground_move_jump_pillar(false);
+        }
+
+        st = e.activatedline.getUDMFstring("user_tooltip");
+        if(st.length() > 0)
+        {
+            //should be player, so
+            e.thing.A_Print(st, 0);
+            e.ShouldActivate = false;
         }
     }
 }
