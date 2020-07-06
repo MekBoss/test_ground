@@ -8,6 +8,8 @@ private sector monster_spawn, item_spawn, weapon_spawn, battle_arena;
 private sector jump_pillar_sector;
 private array<sector> jump_pillar_aditional;
 
+private int monster_spawn_method;
+
 private void ground_freeze_actor(actor a)
 {
     if(a)
@@ -237,9 +239,33 @@ override void WorldLinePreActivated(WorldEvent e)
         string st = e.activatedline.getUDMFstring("user_doom_spawn_type");
         if(st.length() > 0)
         {
-            //buttons shopuld do play "DUN" actiavation sound
+            //buttons should do play "DUN" actiavation sound
             //e.ShouldActivate = false;
-            ground_spawn_monster(st);
+
+            switch(monster_spawn_method)
+            {
+                default:
+                break;
+
+                case 0:
+                    ground_spawn_monster(st);
+                break;
+
+                case 1:
+                    if(e.activatedline.getUDMFstring("user_monster_spawn_method").Length() > 0)
+                    {}
+                    else
+                        ground_spawn_monster(st);
+                break;
+
+                case 2:
+                    if(e.activatedline.getUDMFstring("user_monster_spawn_method").Length() > 0)
+                        ground_spawn_monster(st);
+                    else
+                    {}
+                break;
+            }
+            
             return;
         }
 
@@ -298,6 +324,35 @@ override void WorldLinePreActivated(WorldEvent e)
             e.thing.A_Print(st, 0);
             e.ShouldActivate = false;
         }
+
+        int num = e.activatedline.getUDMFint("user_monster_spawn_method");
+        if(num > 0)
+        {
+            switch(monster_spawn_method)
+            {
+                default:
+                    e.thing.A_Print("Somethings goes wrong with changing of monster spawn method. \n Try again", 0);
+                    monster_spawn_method = 0;
+                break;
+
+                case 0:
+                    e.thing.A_Print("Change monster spawn method to: Buttons", 0);
+                    monster_spawn_method = 1;
+                break;
+
+                case 1:
+                    e.thing.A_Print("Change monster spawn method to: Shots", 0);
+                    monster_spawn_method = 2;
+                break;
+
+                case 2:
+                    e.thing.A_Print("Change monster spawn method to: Shots & Buttons", 0);
+                    monster_spawn_method = 0;
+                break;
+            }
+            
+        }
+        
     }
 }
 
