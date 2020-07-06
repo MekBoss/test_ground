@@ -237,7 +237,8 @@ override void WorldLinePreActivated(WorldEvent e)
         string st = e.activatedline.getUDMFstring("user_doom_spawn_type");
         if(st.length() > 0)
         {
-            e.ShouldActivate = false;
+            //buttons shopuld do play "DUN" actiavation sound
+            //e.ShouldActivate = false;
             ground_spawn_monster(st);
             return;
         }
@@ -261,7 +262,8 @@ override void WorldLinePreActivated(WorldEvent e)
         st = e.activatedline.getUDMFstring("user_clear_sector");
         if(st.length() > 0)
         {
-            e.ShouldActivate = false;
+            //buttons shopuld do play "DUN" actiavation sound
+            //e.ShouldActivate = false;
             switch(name(st) )
             {
                 default:
@@ -292,7 +294,7 @@ override void WorldLinePreActivated(WorldEvent e)
         st = e.activatedline.getUDMFstring("user_tooltip");
         if(st.length() > 0)
         {
-            //should be player, so
+            //should always be player, so...
             e.thing.A_Print(st, 0);
             e.ShouldActivate = false;
         }
